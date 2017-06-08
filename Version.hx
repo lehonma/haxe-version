@@ -42,6 +42,23 @@ class Version {
     }
 
     /**
+        Return the latest git commit timestamp. Example usage:
+
+        git commit timestamp from which this library was built.
+        public static var version_date(default, never) : Float = Version.getGitCommitTimestamp();
+    **/
+    public static macro function getGitCommitTimestamp() : haxe.macro.Expr
+    {
+        var git_log = new sys.io.Process('git',["log","-1","--format=%ct"]);
+        if(git_log.exitCode() != 0)
+            throw('git log -1 --format=%ct failed: ${git_log.stderr.readAll().toString()}');
+        
+        var commit_timestamp = Std.parseFloat(git_log.stdout.readLine());
+        
+        return macro $v{commit_timestamp};
+    }
+
+    /**
         Return the version of Haxe. Example usage:
 
             Version of Haxe used to build this library.
